@@ -6,7 +6,7 @@ services:
     build:
       context: "./squid"
       args:
-        SQUID_VERSION: 5.4.1
+        SQUID_VERSION: 6.1
     restart: always
     ports:
       - "3128:3128"

@@ -1,5 +1,5 @@
 
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 # Install dependencies
 RUN apt-get update && \
@@ -13,11 +13,12 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get remove --purge --auto-remove -y && \
     rm -rf /var/lib/apt/lists/*;
 
+# Build squid
 WORKDIR /src
 
-ARG SQUID_VERSION=${SQUID_VERSION:-5.4.1}
+ARG SQUID_VERSION=${SQUID_VERSION:-6.1}
 
-# Download and extract squid source files
+## Download and extract squid source files
 RUN wget http://www.squid-cache.org/Versions/v${SQUID_VERSION%%.*}/squid-$SQUID_VERSION.tar.gz && \
     mkdir squid && \
     tar -C squid --strip-components=1 -xzvf squid-$SQUID_VERSION.tar.gz && \
@@ -25,7 +26,7 @@ RUN wget http://www.squid-cache.org/Versions/v${SQUID_VERSION%%.*}/squid-$SQUID_
 
 WORKDIR /src/squid
 
-# Configure squid build
+## Configure squid build
 RUN ./configure \
         # Ubuntu specific options
         --prefix=/usr \
@@ -41,7 +42,7 @@ RUN ./configure \
         --with-openssl \
         --enable-ssl-crtd
 
-# Build and install squid
+## Build and install squid
 RUN make -j$(nproc) && \
     make install
 
@@ -53,21 +54,22 @@ RUN chown -R proxy:proxy squid && \
 
 WORKDIR /etc/squid
 
-# Create directory
+# Create ssl cert
 RUN mkdir ssl_cert && \
     chown proxy:proxy ssl_cert && \
     chmod 700 ssl_cert;
 
 WORKDIR /
 
-# Create and initialize TLS certificates cache directory
+## Create and initialize TLS certificates cache directory
 RUN /usr/lib/squid/security_file_certgen -c -s /var/lib/ssl_db -M 4MB && \
     chown proxy:proxy -R /var/lib/ssl_db;
 
-# Specify CA attributes
+## Specify CA attributes
 COPY build/openssl.cfg /etc/ssl
 RUN cat /etc/ssl/openssl.cfg >> /etc/ssl/openssl.cnf
 
+# Expose proxy ports
 EXPOSE 3128 3129
 
 # Entrypoint
