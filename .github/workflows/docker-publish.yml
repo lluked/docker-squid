@@ -26,9 +26,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-      # This is used to complete the identity challenge
-      # with sigstore/fulcio when running outside of PRs.
-      id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -37,27 +34,22 @@ jobs:
           - buildjet-2vcpu-ubuntu-2204-arm
     runs-on: ${{ matrix.runs-on }}
     steps:
-      - name: Checkout repository
+      - 
+        name: Checkout repository
         uses: actions/checkout@v3
-
-      # Install the cosign tool except on PR
-      # https://github.com/sigstore/cosign-installer
-      - name: Install cosign
-        if: github.event_name != 'pull_request'
-        uses: sigstore/cosign-installer@6e04d228eb30da1757ee4e1dd75a0ec73a653e06 #v3.1.1
-        with:
-          cosign-release: 'v2.1.1'
-
-      # - name: Set up QEMU
-      #   uses: docker/setup-qemu-action@v2
-
-      # Workaround: https://github.com/docker/build-push-action/issues/461
-      - name: Setup Docker buildx
+      - 
+        name: Setup Docker buildx
         uses: docker/setup-buildx-action@v2
-
-      # Build and push Docker image with Buildx (don't push)
-      # https://github.com/docker/build-push-action
-      - name: Build the Docker image
+      - 
+        name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - 
+        name: Build the Docker image
         id: build
         uses: docker/build-push-action@v4
         with:
@@ -66,28 +58,24 @@ jobs:
           outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      - name: Export digest
+      - 
+        name: Export digest
         run: |
           mkdir -p /tmp/digests
           digest="${{ steps.build.outputs.digest }}"
           touch "/tmp/digests/${digest#sha256:}"
-
-      - name: Upload digest
+      - 
+        name: Upload digest
         uses: actions/upload-artifact@v3
         with:
           name: digests
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
-
-  push-images:
+  push-metadata:
     permissions:
       contents: read
       packages: write
-      # This is used to complete the identity challenge
-      # with sigstore/fulcio when running outside of PRs.
-      id-token: write
     runs-on: ubuntu-latest
     needs:
       - build-images
@@ -107,10 +95,8 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ${{ env.REGISTRY_IMAGE }}
-
-      # Login against a Docker registry except on PR
-      # https://github.com/docker/login-action
-      - name: Log into registry ${{ env.REGISTRY }}
+      - 
+        name: Log into registry ${{ env.REGISTRY }}
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v2
         with:
