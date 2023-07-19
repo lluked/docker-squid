@@ -87,7 +87,7 @@ jobs:
       packages: write
     runs-on: ubuntu-latest
     needs:
-      - images
+      - build_images
     steps:
       -
         name: Download digests
