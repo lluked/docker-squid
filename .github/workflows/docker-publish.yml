@@ -22,7 +22,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  images:
+  build_images:
     permissions:
       contents: read
       packages: write
@@ -31,7 +31,7 @@ jobs:
       matrix:
         runs-on:
           - ubuntu-latest
-          - buildjet-2vcpu-ubuntu-2204-arm
+          - buildjet-4vcpu-ubuntu-2204-arm
     runs-on: ${{ matrix.runs-on }}
     steps:
       - 
@@ -60,8 +60,9 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./squid
+          push: true
           labels: ${{ steps.meta.outputs.labels }}
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs.bake-file.args.DOCKER_META_IMAGES }}:build_image
           outputs: type=image,name=${{ steps.meta.outputs.bake-file.args.DOCKER_META_IMAGES }},name-canonical=true
           cache-from: type=gha
           cache-to: type=gha,mode=max
