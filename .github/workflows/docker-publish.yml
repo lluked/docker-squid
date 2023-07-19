@@ -62,7 +62,7 @@ jobs:
           context: ./squid
           push: true
           labels: ${{ steps.meta.outputs.labels }}
-          tags: ${{ steps.meta.outputs.bake-file.args.DOCKER_META_IMAGES }}:build_image
+          tags: ${{ steps.meta.outputs.tags }}
           outputs: type=image,name=${{ steps.meta.outputs.bake-file.args.DOCKER_META_IMAGES }},name-canonical=true
           cache-from: type=gha
           cache-to: type=gha,mode=max
