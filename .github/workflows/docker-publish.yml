@@ -23,7 +23,6 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
@@ -33,9 +32,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform:
-          - linux/amd64
-          - linux/arm64
+        runs-on:
+          - ubuntu-latest
+          - buildjet-2vcpu-ubuntu-2204-arm
+    runs-on: ${{ matrix.runs-on }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -48,8 +48,8 @@ jobs:
         with:
           cosign-release: 'v2.1.1'
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v2
 
       # Workaround: https://github.com/docker/build-push-action/issues/461
       - name: Setup Docker buildx
@@ -80,7 +80,6 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./squid
-          platforms: ${{ matrix.platform }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
