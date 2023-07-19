@@ -60,8 +60,9 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./squid
+          push: true
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=${{ steps.meta.outputs.bake-file.args.DOCKER_META_IMAGES }},push-by-digest=true,name-canonical=true
+          tags: ${{ steps.build.outputs.digest }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - 
@@ -115,7 +116,7 @@ jobs:
         working-directory: /tmp/digests
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)
+            $(printf '${{ steps.meta.outputs.bake-file.args.DOCKER_META_IMAGES }}@sha256:%s ' *)
       -
         name: Inspect image
         run: |
