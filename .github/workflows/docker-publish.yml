@@ -22,7 +22,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-images:
+  images:
     permissions:
       contents: read
       packages: write
@@ -79,13 +79,13 @@ jobs:
           if-no-files-found: error
           retention-days: 1
   
-  push-metadata:
+  manifest:
     permissions:
       contents: read
       packages: write
     runs-on: ubuntu-latest
     needs:
-      - build-images
+      - images
     steps:
       -
         name: Download digests
@@ -101,7 +101,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY_IMAGE }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
       - 
         name: Log into registry ${{ env.REGISTRY }}
         if: github.event_name != 'pull_request'
