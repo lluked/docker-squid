@@ -2,10 +2,10 @@ name: Package Cleanup
 
 on:
   workflow_dispatch
-#   workflow_run:
-#     workflows: [Docker Publish]
-#     types:
-#       - completed
+  workflow_run:
+    workflows: [Docker Publish]
+    types:
+      - completed
 
 jobs:
   cleanup-packages:
@@ -18,4 +18,5 @@ jobs:
         with: 
           package-name: 'docker-squid'
           package-type: 'container'
+          min-versions-to-keep: 4
           delete-only-untagged-versions: 'true'
