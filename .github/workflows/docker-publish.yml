@@ -63,7 +63,7 @@ jobs:
           push: true
           labels: ${{ steps.meta.outputs.labels }}
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test
-          outputs: type=image
+          outputs: type=image,push-by-digest=true
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - 
