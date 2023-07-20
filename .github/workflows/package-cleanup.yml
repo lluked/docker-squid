@@ -14,5 +14,4 @@ jobs:
         with: 
           package-name: 'docker-squid'
           package-type: 'container'
-          min-versions-to-keep: 1
           delete-only-untagged-versions: 'true'
