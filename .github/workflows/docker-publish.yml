@@ -62,7 +62,7 @@ jobs:
           context: ./squid
           push: true
           labels: ${{ steps.meta.outputs.labels }}
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ digest }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test
           outputs: type=image
           cache-from: type=gha
           cache-to: type=gha,mode=max
