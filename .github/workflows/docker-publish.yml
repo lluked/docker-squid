@@ -62,25 +62,24 @@ jobs:
           context: ./squid
           push: true
           labels: ${{ steps.meta.outputs.labels }}
-          tags: ${{ steps.meta.outputs.tags }}
-          outputs: type=image,name=${{ steps.meta.outputs.bake-file.args.DOCKER_META_IMAGES }},name-canonical=true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.build.outputs.digest }}
+          outputs: type=image
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      # - 
-      #   name: Export digest
-      #   run: |
-      #     mkdir -p /tmp/digests
-      #     digest="${{ steps.build.outputs.digest }}"
-      #     touch "/tmp/digests/${digest#sha256:}"
-      # - 
-      #   name: Upload digest
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: digests
-      #     path: /tmp/digests/*
-      #     if-no-files-found: error
-      #     retention-days: 1
+      - 
+        name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+      - 
+        name: Upload digest
+        uses: actions/upload-artifact@v3
+        with:
+          name: digests
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
   
   # manifest:
   #   permissions:
