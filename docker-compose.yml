@@ -12,5 +12,5 @@ services:
       - "3128:3128"
       - "3129:3129"      
     volumes:
-      - ./certs:/etc/squid/ssl_cert
+      - ./squid/certs:/etc/squid/ssl_cert
       - ./squid/squid.conf:/etc/squid/squid.conf
