@@ -60,10 +60,8 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./squid
-          push: true
           labels: ${{ steps.meta.outputs.labels }}
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test
-          outputs: type=image,push-by-digest=true
+          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - 
