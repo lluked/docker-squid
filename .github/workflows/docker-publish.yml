@@ -61,6 +61,7 @@ jobs:
           mkdir -p /tmp/digests
           digest="${{ steps.build.outputs.digest }}"
           touch "/tmp/digests/${digest#sha256:}"
+          docker buildx imagetools inspect --raw ghcr.io/lluked/docker-squid | jq '.manifests[] |select(.platform.architecture |contains("unknown")| not)' > "/tmp/digests/${digest#sha256:}".json
       - 
         name: Upload digest
         uses: actions/upload-artifact@v3
@@ -85,32 +86,33 @@ jobs:
           name: digests
           path: /tmp/digests
       - 
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - 
-        name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-      - 
-        name: Log into registry ${{ env.REGISTRY }}
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - 
-        name: debug $DOCKER_METADATA_OUTPUT_JSON
+        name: debug digests
         run: |
-          echo $DOCKER_METADATA_OUTPUT_JSON
-      - 
-        name: Create manifest list and push
-        working-directory: /tmp/digests
-        run: |
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:%s ' *)
-      - 
-        name: Inspect image
-        run: |
-          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
+          ls /tmp/digests
+          find ./ -type f | xargs tail -n +1
+      # - 
+      #   name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v2
+      # - 
+      #   name: Docker meta
+      #   id: meta
+      #   uses: docker/metadata-action@v4
+      #   with:
+      #     images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      # - 
+      #   name: Log into registry ${{ env.REGISTRY }}
+      #   uses: docker/login-action@v2
+      #   with:
+      #     registry: ${{ env.REGISTRY }}
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
+      # - 
+      #   name: Create manifest list and push
+      #   working-directory: /tmp/digests
+      #   run: |
+      #     docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+      #       $(printf '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:%s ' *)
+      # - 
+      #   name: Inspect image
+      #   run: |
+      #     docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
