@@ -60,8 +60,7 @@ jobs:
         run: |
           mkdir -p /tmp/digests
           digest="${{ steps.build.outputs.digest }}"
-          touch "/tmp/digests/${digest#sha256:}"
-          docker buildx imagetools inspect --raw ghcr.io/lluked/docker-squid | jq '.manifests[] |select(.platform.architecture |contains("unknown")| not)' > "/tmp/digests/${digest#sha256:}".json
+          docker buildx imagetools inspect --raw ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} | jq '.manifests[] |select(.platform.architecture |contains("unknown")| not)' > "/tmp/digests/${digest#sha256:}".json
       - 
         name: Upload digest
         uses: actions/upload-artifact@v3
