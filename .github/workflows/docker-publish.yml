@@ -61,7 +61,7 @@ jobs:
           mkdir -p /tmp/manifests
           digest='${{ steps.build.outputs.digest }}'
           metadata='${{ steps.build.outputs.metadata }}'
-          echo '$metadata' > "/tmp/manifests/${digest#sha256:}"
+          echo "$metadata" > "/tmp/manifests/${digest#sha256:}"
       - 
         name: Upload manifest
         uses: actions/upload-artifact@v3
