@@ -60,7 +60,7 @@ jobs:
         run: |
           mkdir -p /tmp/digests
           digest="${{ steps.build.outputs.digest }}"
-          echo $DOCKER_METADATA_OUTPUT_JSON > > "/tmp/digests/meta-${digest#sha256:}".json
+          echo $DOCKER_METADATA_OUTPUT_JSON > "/tmp/digests/meta-${digest#sha256:}".json
           docker buildx imagetools inspect --raw ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} > "/tmp/digests/${digest#sha256:}".json
       - 
         name: Upload digest
