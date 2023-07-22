@@ -72,7 +72,7 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  create_registry_manifest:
+  create_multi-arch_image:
     permissions:
       contents: read
       packages: write
@@ -90,7 +90,7 @@ jobs:
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - 
-        name: Docker meta
+        name: Docker meta to populate DOCKER_METADATA_OUTPUT_JSON variable
         id: meta
         uses: docker/metadata-action@v4
         with:
