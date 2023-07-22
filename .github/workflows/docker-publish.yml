@@ -59,9 +59,9 @@ jobs:
         name: Export manifest
         run: |
           mkdir -p /tmp/manifests
-          digest="${{ steps.build.outputs.digest }}"
-          metadata="${{ steps.build.outputs.metadata }}"
-          echo "$metadata" > "/tmp/manifests/${digest#sha256:}"
+          digest='${{ steps.build.outputs.digest }}'
+          metadata='${{ steps.build.outputs.metadata }}'
+          echo '$metadata' > "/tmp/manifests/${digest#sha256:}"
       - 
         name: Upload manifest
         uses: actions/upload-artifact@v3
@@ -103,6 +103,10 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - 
+        name: debug $DOCKER_METADATA_OUTPUT_JSON
+        run: |
+          echo $DOCKER_METADATA_OUTPUT_JSON
       - 
         name: Log into registry ${{ env.REGISTRY }}
         uses: docker/login-action@v2
