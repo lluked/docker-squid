@@ -89,7 +89,6 @@ jobs:
         run: |
           ls /tmp/digests
           find ./ -type f | xargs tail -n +1
-          docker pull ghcr.io/lluked/docker-squid:main
       - 
         name: debug $DOCKER_METADATA_OUTPUT_JSON
         run: |
